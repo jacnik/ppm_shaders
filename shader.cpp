@@ -39,12 +39,13 @@ vec4 operator /(const vec4 &a, const vec4 &b) { return vec4(a.x/b.x, a.y/b.y, a.
 vec4 operator -(float s, const vec4 &a) { return vec4(s-a.x, s-a.y, s-a.z, s-a.w); }
 vec4 &operator +=(vec4 &a, const vec4 &b) { a = a + b; return a; }
 
+#define FRAMES 240
 
 int main()
 {
 	char name_buf[256];
-	for (int i = 0; i < 60; ++i) {
-		snprintf(name_buf, sizeof(name_buf), "output-%02d.ppm", i);
+	for (int i = 0; i < FRAMES; ++i) {
+		snprintf(name_buf, sizeof(name_buf), "output-%03d.ppm", i);
 		const char *output_path = name_buf;
 		FILE *f = fopen(output_path, "wb");
 		int w = 16 * 60;
@@ -55,12 +56,13 @@ int main()
 		fprintf(f, "255\n");
 
 		vec2 r = vec2((float)w, (float)h);
-		float t = (float)i/60;
+		float t = ((float)i/FRAMES)*2*M_PI;
 		for (int y = 0; y < h; ++y) {
 			for (int x = 0; x < w; ++x) {
 				vec2 FC = vec2((float)x, float(y));
 				vec4 o;
 				// Plasma shader
+				//  https://x.com/XorDev/status/1894123951401378051
 				vec2 p=(FC*2.-r)/r.y,l,i,v=p*(l+=4.-4.*abs(.7-dot(p,p)));
 				for(;i.y++<8.;o+=(sin(v.xyyx())+1.)*abs(v.x-v.y))
 					v+=cos(v.yx()*i.y+i+t)/i.y+.7;
@@ -74,7 +76,7 @@ int main()
 			}
 		}
 		fclose(f);
-		printf("Generated %s\n", output_path);
+		printf("Generated %s (%3d/%3d)\n", output_path, i+1, FRAMES);
 	}
 
 	return 0;
