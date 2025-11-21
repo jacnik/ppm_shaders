@@ -42,6 +42,20 @@ vec4 &operator +=(vec4 &a, const vec4 &b) { a = a + b; return a; }
 
 #define FRAMES 240
 
+void plasma_shader(const vec2 &FC, const vec2 &r, float t, vec4 &o) {
+	// Plasma shader
+	// https://x.com/XorDev/status/1894123951401378051
+	vec2 p=(FC*2.-r)/r.y,l,i,v=p*(l+=4.-4.*abs(.7-dot(p,p)));
+	for(;i.y++<8.;) {
+		vec4 left = sin(v.xyyx()) + 1.;
+		float right = abs(v.x - v.y);
+		vec4 res = left * right;
+		o += res;
+		v += cos(v.yx() * i.y + i + t)/i.y + .7;
+	}
+	o = tanh(5.*exp(l.x-4.-p.y*vec4(-1,1,2,0))/o);
+}
+
 int main()
 {
 	char name_buf[256];
@@ -62,18 +76,9 @@ int main()
 			for (int x = 0; x < w; ++x) {
 				vec2 FC = vec2((float)x, float(y));
 				vec4 o;
-				// Plasma shader
-				//  https://x.com/XorDev/status/1894123951401378051
-				vec2 p=(FC*2.-r)/r.y,l,i,v=p*(l+=4.-4.*abs(.7-dot(p,p)));
-				for(;i.y++<8.;) {
-					vec4 left = sin(v.xyyx()) + 1.;
-					float right = abs(v.x - v.y);
-					vec4 res = left * right;
-					o += res;
-					v += cos(v.yx() * i.y + i + t)/i.y + .7;
-				}
-				o=tanh(5.*exp(l.x-4.-p.y*vec4(-1,1,2,0))/o);
-				// ******
+
+				plasma_shader(FC, r, t, o);
+
 				fputc(o.x*255, f);
 				fputc(o.y*255, f);
 				fputc(o.z*255, f);
