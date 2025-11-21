@@ -1,13 +1,11 @@
 target := shader
 
-all: shader
-
-shader: clean
-	cc -o $(target) $(target).c
+shader: shader.cpp
+	cc -O3 -o $(target) $(target).cpp -lm
 
 clean:
 	rm -f $(target) *.ppm *.mp4
 
-run: shader
+run: clean shader
 	./shader
 
