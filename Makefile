@@ -1,7 +1,8 @@
 target := shader
+cc = clang
 
 shader: shader.cpp
-	cc -O3 -o $(target) $(target).cpp -lm
+	$(cc) -O3 -o $(target) $(target).cpp -lm
 
 clean:
 	rm -f $(target) *.ppm *.mp4

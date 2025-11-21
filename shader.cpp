@@ -14,6 +14,7 @@ struct vec2 {
 	vec4 xyyx() const { return vec4(x, y, y, x); }
 };
 float dot(const vec2 &a, const vec2 &b) { return a.x*b.x + a.y*b.y; }
+float abs(float s) { return fabsf(s); }
 vec2 abs(const vec2 &a) { return vec2(fabsf(a.x), fabsf(a.y)); }
 vec2 cos(const vec2 &a) { return vec2(cosf(a.x), cosf(a.y)); }
 
@@ -64,11 +65,14 @@ int main()
 				// Plasma shader
 				//  https://x.com/XorDev/status/1894123951401378051
 				vec2 p=(FC*2.-r)/r.y,l,i,v=p*(l+=4.-4.*abs(.7-dot(p,p)));
-				for(;i.y++<8.;o+=(sin(v.xyyx())+1.)*abs(v.x-v.y))
-					v+=cos(v.yx()*i.y+i+t)/i.y+.7;
-
+				for(;i.y++<8.;) {
+					vec4 left = sin(v.xyyx()) + 1.;
+					float right = abs(v.x - v.y);
+					vec4 res = left * right;
+					o += res;
+					v += cos(v.yx() * i.y + i + t)/i.y + .7;
+				}
 				o=tanh(5.*exp(l.x-4.-p.y*vec4(-1,1,2,0))/o);
-
 				// ******
 				fputc(o.x*255, f);
 				fputc(o.y*255, f);
